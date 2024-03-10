@@ -1,10 +1,8 @@
-export interface Options {
+export type Options = {
 	/**
-	@default 'http:'
-
-	Values: `'https:' | 'http:'`
+	@default 'http'
 	*/
-	readonly defaultProtocol?: string; // TODO: Make this `'https:' | 'http:'` in the next major version.
+	readonly defaultProtocol?: 'https' | 'http';
 
 	/**
 	Prepends `defaultProtocol` to the URL if it's protocol-relative.
@@ -23,7 +21,7 @@ export interface Options {
 	readonly normalizeProtocol?: boolean;
 
 	/**
-	Normalizes `https:` URLs to `http:`.
+	Normalizes HTTPS URLs to HTTP.
 
 	@default false
 
@@ -39,9 +37,9 @@ export interface Options {
 	readonly forceHttp?: boolean;
 
 	/**
-	Normalizes `http:` URLs to `https:`.
+	Normalizes HTTP URLs to HTTPS.
 
-	This option can't be used with the `forceHttp` option at the same time.
+	This option cannot be used with the `forceHttp` option at the same time.
 
 	@default false
 
@@ -63,10 +61,10 @@ export interface Options {
 
 	@example
 	```
-	normalizeUrl('user:password@sindresorhus.com');
+	normalizeUrl('https://user:password@sindresorhus.com');
 	//=> 'https://sindresorhus.com'
 
-	normalizeUrl('user:password@sindresorhus.com', {stripAuthentication: false});
+	normalizeUrl('https://user:password@sindresorhus.com', {stripAuthentication: false});
 	//=> 'https://user:password@sindresorhus.com'
 	```
 	*/
@@ -250,6 +248,23 @@ export interface Options {
 	readonly removeDirectoryIndex?: boolean | ReadonlyArray<RegExp | string>;
 
 	/**
+	Removes an explicit port number from the URL.
+
+	Port 443 is always removed from HTTPS URLs and 80 is always removed from HTTP URLs regardless of this option.
+
+	@default false
+
+	@example
+	```
+	normalizeUrl('sindresorhus.com:123', {
+		removeExplicitPort: true
+	});
+	//=> 'http://sindresorhus.com'
+	```
+	*/
+	readonly removeExplicitPort?: boolean;
+
+	/**
 	Sorts the query parameters alphabetically by key.
 
 	@default true
@@ -263,10 +278,14 @@ export interface Options {
 	```
 	*/
 	readonly sortQueryParameters?: boolean;
-}
+};
 
 /**
 [Normalize](https://en.wikipedia.org/wiki/URL_normalization) a URL.
+
+URLs with custom protocols are not normalized and just passed through by default. Supported protocols are: `https`, `http`, `file`, and `data`.
+
+Human-friendly URLs with basic auth (for example, `user:password@sindresorhus.com`) are not handled because basic auth conflicts with custom protocols. [Basic auth URLs are also deprecated.](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#access_using_credentials_in_the_url)
 
 @param url - URL to normalize, including [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
 
