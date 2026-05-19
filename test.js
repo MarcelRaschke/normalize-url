@@ -247,6 +247,9 @@ test('removeExplicitPort option', t => {
 	t.is(normalizeUrl('https://sindresorhus.com:123', options), 'https://sindresorhus.com');
 	t.is(normalizeUrl('http://sindresorhus.com:443', options), 'http://sindresorhus.com');
 	t.is(normalizeUrl('https://sindresorhus.com:80', options), 'https://sindresorhus.com');
+	t.is(normalizeUrl('localhost:9802', options), 'http://localhost');
+	t.is(normalizeUrl('localhost:9802', {...options, stripProtocol: true}), 'localhost');
+	t.is(normalizeUrl('localhost:9802/path', options), 'http://localhost/path');
 });
 
 test('removeSingleSlash option', t => {
@@ -471,6 +474,10 @@ test('does not have exponential performance for data URLs', t => {
 
 test('ignore custom schemes', t => {
 	t.is(normalizeUrl('tel:004346382763'), 'tel:004346382763');
+	t.is(normalizeUrl('tel:12345'), 'tel:12345');
+	t.is(normalizeUrl('tel:12345', {removeExplicitPort: true}), 'tel:12345');
+	t.is(normalizeUrl('sms:911'), 'sms:911');
+	t.is(normalizeUrl('sms:911', {removeExplicitPort: true}), 'sms:911');
 	t.is(normalizeUrl('mailto:office@foo.com'), 'mailto:office@foo.com');
 	t.is(normalizeUrl('sindre://www.sindresorhus.com'), 'sindre://www.sindresorhus.com');
 	t.is(normalizeUrl('foo.bar://www.example.com'), 'foo.bar://www.example.com');
